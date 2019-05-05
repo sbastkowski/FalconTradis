@@ -160,11 +160,11 @@ class BlockInsertions:
 		while i < len(windows):
 			next_window = windows[i]
 
-			if next_window.feature.location.start <= start_window.feature.location.end and \
+			if next_window.start <= start_window.end and \
 					next_window.category() == start_window.category() and \
 					next_window.expression_from_blocks() == start_window.expression_from_blocks() and \
 					next_window.direction_from_blocks() == start_window.direction_from_blocks():
-				start_window.feature.location.end = next_window.feature.location.end
+				start_window.end = next_window.end
 				start_window.max_logfc = max(start_window.max_logfc, next_window.max_logfc)
 			else:
 				merged_windows.append(start_window)

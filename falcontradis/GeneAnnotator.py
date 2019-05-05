@@ -62,6 +62,8 @@ class GeneAnnotator:
 				g.categories.append('unclassified')
 
 			g.max_logfc_from_category()
+			g.start = g.feature.location.start
+			g.end = g.feature.location.end
 			genes.append(g)
 
 		# intergenic test
