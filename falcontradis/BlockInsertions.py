@@ -1,8 +1,6 @@
 '''Driver class'''
 import logging
 import os
-import sys
-import time
 import shutil
 from falcontradis.TradisGeneInsertSites import TradisGeneInsertSites
 from falcontradis.PrepareInputFiles     import PrepareInputFiles
@@ -12,7 +10,8 @@ from falcontradis.TradisComparison      import TradisComparison
 from falcontradis.PlotLog               import PlotLog
 from falcontradis.PlotMasking           import PlotMasking
 from falcontradis.BlockIdentifier       import BlockIdentifier
-from falcontradis.GeneAnnotator        import GeneAnnotator
+from falcontradis.Gene                  import Gene
+from falcontradis.GeneAnnotator         import GeneAnnotator
 
 class PlotEssentiality:
 	def __init__(self, plotfile_obj,gene_insert_sites_filename, tradis_essentiality_filename, type, only_essential_filename):
@@ -167,7 +166,11 @@ class BlockInsertions:
 				start_window.end = next_window.end
 				start_window.max_logfc = max(start_window.max_logfc, next_window.max_logfc)
 			else:
-				merged_windows.append(start_window)
+				copy = Gene(start_window.feature, start_window.blocks)
+				copy.start = start_window.start
+				copy.end = start_window.end
+				copy.max_logfc = start_window.max_logfc
+				merged_windows.append(copy)
 				start_window = next_window
 
 			i += 1
@@ -208,8 +211,12 @@ class BlockInsertions:
 		block_filename = os.path.join(self.prefix, "gene_report.csv")
 		with open(block_filename, 'w') as bf:
 			bf.write(str(genes[0].header())+"\n")
-			for i in genes:
-				bf.write(str(i)+"\n")
+			if not self.use_annotation:
+				for i in genes:
+					bf.write(i.window_string() +"\n")
+			else:
+				for i in genes:
+					bf.write(str(i) +"\n")
 			for b in intergenic_blocks:
 				bf.write(str(b)+"\n")
 				

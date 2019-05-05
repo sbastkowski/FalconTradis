@@ -81,8 +81,12 @@ class Gene:
 		else:
 			return ""
 
+	def window_string(self):
+		return "\t".join(
+			[str(self.start) + '_' + str(self.end), str(self.category()), str(self.start), str(self.end), str(self.max_logfc), str(self.expression_from_blocks()), str(self.direction_from_blocks()), str(self.upstream_gene())])
+
 	def __str__(self):
-		return "\t".join([str(self.gene_name), str(self.category()), str(self.start), str(self.end), str(self.max_logfc),  str(self.expression_from_blocks()), str(self.direction_from_blocks()), str(self.upstream_gene())] )
+		return "\t".join([str(self.gene_name), str(self.category()), str(self.feature.location.start), str(self.feature.location.end), str(self.max_logfc_from_category()),  str(self.expression_from_blocks()), str(self.direction_from_blocks()), str(self.upstream_gene())] )
 		
 	def header(self):
 		return "\t".join(['Gene', 'Category', 'Start', 'End', 'MaxLogFC', 'Expression', 'Direction', 'Upstream'])
