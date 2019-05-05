@@ -1,6 +1,4 @@
 import os
-import shutil
-import sys
 import glob
 from setuptools import setup, find_packages, Extension
 
@@ -20,14 +18,14 @@ if USE_CYTHON:
     extensions = cythonize(extensions)
 	
 setup(
-    name='albatradis',
+    name='falcontradis',
     version=version,
     description='TraDIStron',
 	long_description=read('README.md'),
     packages = find_packages(),
-    author='Andrew J. Page',
-    author_email='andrew.page@quadram.ac.uk',
-    url='https://github.com/quadram-institute-bioscience/albatradis',
+    author='Sarah Bastkowski',
+    author_email='sarah.bastkowski@quadram.ac.uk',
+    url='https://github.com/sbastkowski/albatradis',
 	ext_modules = extensions,
     scripts=glob.glob('scripts/*'),
     test_suite='nose.collector',

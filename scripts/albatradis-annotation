@@ -5,17 +5,17 @@ import os
 import pkg_resources
 sys.path.append('../')
 sys.path.append('./')
-from albatradis.EMBLExpandGenes import EMBLExpandGenes
+from falcontradis.EMBLExpandGenes import EMBLExpandGenes
 
 version = ''
 try:
-	version = pkg_resources.get_distribution("albatradis").version
+	version = pkg_resources.get_distribution("falcontradis").version
 except pkg_resources.DistributionNotFound:
 	version = 'x.y.z'
 
 parser = argparse.ArgumentParser(
 	description = 'Take in an EMBL file and add flanking 3 prime and 5 prime annotation',
-	usage = 'albatradis-annotation [options] EMBLfile', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	usage = 'falcontradis-annotation [options] EMBLfile', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('emblfile', help='Annotation file in EMBL format', type=str)
 
 parser.add_argument('--feature_size',             '-s', help='Feature size', type=int, default=198)

@@ -5,18 +5,18 @@ import os
 import pkg_resources
 sys.path.append('../')
 sys.path.append('./')
-from albatradis.AlbaTraDISArtemisProject import AlbaTraDISArtemisProject
+from falcontradis.AlbaTraDISArtemisProject import AlbaTraDISArtemisProject
 
 
 version = ''
 try:
-	version = pkg_resources.get_distribution("albatradis").version
+	version = pkg_resources.get_distribution("falcontradis").version
 except pkg_resources.DistributionNotFound:
 	version = 'x.y.z'
 
 parser = argparse.ArgumentParser(
 	description = 'Create an artemis project file',
-	usage = 'albatradis-artemis_project [options] reference experiments_metadata.csv', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	usage = 'falcontradis-artemis_project [options] reference experiments_metadata.csv', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('reference', help='reference EMBL file', type=str)	
 parser.add_argument('experiments_metadata', help='experiments metadata spreadsheet', type=str)
 

@@ -5,18 +5,18 @@ import os
 import pkg_resources
 sys.path.append('../')
 sys.path.append('./')
-from albatradis.AlbaTraDISGeneReports import AlbaTraDISGeneReports
+from falcontradis.AlbaTraDISGeneReports import AlbaTraDISGeneReports
 
 
 version = ''
 try:
-	version = pkg_resources.get_distribution("albatradis").version
+	version = pkg_resources.get_distribution("falcontradis").version
 except pkg_resources.DistributionNotFound:
 	version = 'x.y.z'
 
 parser = argparse.ArgumentParser(
 	description = 'Manipulate gene_report.csv files, such as performing set operations',
-	usage = 'albatradis-gene_reports [options] gene_report1.csv gene_report2.csv ...', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	usage = 'falcontradis-gene_reports [options] gene_report1.csv gene_report2.csv ...', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('genereports', help='Gene report spreadsheets', nargs='+', type=str)
 parser.add_argument('--prefix', '-o',  help='Output directory prefix', type=str, default='output')
 

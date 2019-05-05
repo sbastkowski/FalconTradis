@@ -5,18 +5,18 @@ import os
 import pkg_resources
 sys.path.append('../')
 sys.path.append('./')
-from albatradis.AlbaTraDIS import AlbaTraDIS
+from falcontradis.AlbaTraDIS import AlbaTraDIS
 
 
 version = ''
 try:
-	version = pkg_resources.get_distribution("albatradis").version
+	version = pkg_resources.get_distribution("falcontradis").version
 except pkg_resources.DistributionNotFound:
 	version = 'x.y.z'
 
 parser = argparse.ArgumentParser(
 	description = 'Tradis analysis',
-	usage = 'albatradis [options] EMBLfile condition_plotfiles control_plotfiles', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	usage = 'falcontradis [options] EMBLfile condition_plotfiles control_plotfiles', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('emblfile', help='Annotation file in EMBL format', type=str)
 parser.add_argument('plotfiles', help='Input plot files (optionally gzipped). There must be an equal number of condition and control files', nargs='+', type=str)
 
