@@ -60,12 +60,14 @@ class GeneAnnotator:
 			
 			if len(g.categories) == 0:
 				g.categories.append('unclassified')
+
+			g.max_logfc_from_category()
 			genes.append(g)
 
 		# intergenic test
 		intergenic_blocks = [block for block in self.blocks if block.num_genes == 0]
 		for block in intergenic_blocks:
-			block.upstream  = self.find_nearest_upstream_gene(block)
+			block.upstream = self.find_nearest_upstream_gene(block)
 			block.intergenic = True
 
 		reannotate_with_5_3_prime = self.reannotate_5_3_prime(genes)

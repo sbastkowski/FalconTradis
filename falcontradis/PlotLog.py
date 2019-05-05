@@ -112,7 +112,7 @@ class PlotLog:
 							logfc_to_bases[a] = self.minimum_logfc
 					
 		return logfc_to_bases
-		
+
 	def filter_out_small_blocks(self, logfc_to_bases):
 		logfc_blocks = self.blocks_create(logfc_to_bases)
 		# filter out small blocks

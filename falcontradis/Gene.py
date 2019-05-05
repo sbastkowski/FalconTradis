@@ -10,6 +10,8 @@ class Gene:
 		
 		self.gene_name = self.calc_gene_name()
 
+		self.max_logfc = 0.0
+
 	def calc_gene_name(self):
 		if self.feature:
 			gene_name_val = str(self.feature.location.start) + "_" + str(self.feature.location.end)
@@ -42,7 +44,7 @@ class Gene:
 				elif a == highest_logfc*-1.0:
 					return highest_logfc*-1.0
 		else:
-			return 0
+			return 0.0
 			
 			
 	def max_logfc_from_category(self):
@@ -50,28 +52,19 @@ class Gene:
 
 		if self.category() == 'upregulated':
 			if l < 0:
-				return l*-1
-			else:
-				return l
+				l *= -1.0
 		elif self.category() == 'downregulated':
 			if l > 0:
-				return l*-1
-			else:
-				return l
-				
-		if self.expression_from_blocks() == 'increased_insertions':
+				l *= -1.0
+		elif self.expression_from_blocks() == 'increased_insertions':
 			if l < 0:
-				return l*-1
-			else:
-				return l
+				l *= -1.0
 		elif self.expression_from_blocks() == 'decreased_insertions':
 			if l > 0:
-				return l*-1
-			else:
-				return l
+				l *= -1.0
 
-
-		return l
+		self.max_logfc = l
+		return self.max_logfc
 			
 
 	def expression_from_blocks(self):

@@ -151,6 +151,30 @@ class BlockInsertions:
 			print("Comprison:\t"+ renamed_csv_file)
 			print("Plot log:\t"+ renamed_plot_file)
 		return renamed_plot_file
+
+	def merge_windows(self, windows):
+
+		start_window = windows[0]
+		i = 1
+		merged_windows = []
+		while i < len(windows):
+			next_window = windows[i]
+
+			if next_window.feature.location.start <= start_window.feature.location.end and \
+					next_window.category() == start_window.category() and \
+					next_window.expression_from_blocks() == start_window.expression_from_blocks() and \
+					next_window.direction_from_blocks() == start_window.direction_from_blocks():
+				start_window.feature.location.end = next_window.feature.location.end
+				start_window.max_logfc = max(start_window.max_logfc, next_window.max_logfc)
+			else:
+				merged_windows.append(start_window)
+				start_window = next_window
+
+			i += 1
+
+		merged_windows.append(start_window)
+		return merged_windows
+
 		
 	def gene_statistics(self,forward_plotfile, reverse_plotfile, combined_plotfile, window_size):
 		b = BlockIdentifier(combined_plotfile, forward_plotfile, reverse_plotfile, window_size)
@@ -162,8 +186,14 @@ class BlockInsertions:
 		genes = GeneAnnotator(self.annotation_file , blocks).annotate_genes()
 		intergenic_blocks = [block for block in blocks if block.intergenic]
 
-		
-		if len(genes) == 0:
+		print("#Genes: ", len(genes))
+		print("#Integenic Blocks: ", len(intergenic_blocks))
+
+		# Consolidate all similar adjacent windows if annotation is not used
+		if not self.use_annotation:
+			genes = self.merge_windows(genes)
+
+		if len(genes) == 0 and len(intergenic_blocks) == 0:
 			return []
 		
 		self.write_gene_report(genes, intergenic_blocks)
