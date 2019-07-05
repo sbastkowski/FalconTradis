@@ -1,6 +1,8 @@
 ''' Given an annotation file, take each gene, and create a new feature at the start and end to capture promotors'''
 from falcontradis.EMBLReader import EMBLReader
 from falcontradis.EMBLSequence import EMBLSequence
+from falcontradis.Gene3PrimeWindowGenerator import Gene3PrimeWindowGenerator
+from falcontradis.Gene5PrimeWindowGenerator import Gene5PrimeWindowGenerator
 
 class FeatureProperties:
 	def __init__(self, 	start, end, direction, gene_name, locus_tag, product):
@@ -18,6 +20,8 @@ class EMBLExpandGenes:
 		self.er = EMBLReader(self.embl_file)
 		self.features = self.er.features
 		self.genome_length = self.er.genome_length
+		self.window_size = 25
+		self.window_interval = 10
 	
 	def create_3_5_prime_features(self):
 		new_features = []
@@ -28,20 +32,26 @@ class EMBLExpandGenes:
 			
 			# The gene itself
 			new_features.append(FeatureProperties(feature.location.start, feature.location.end, feature.strand, gene_name, locus_tag, product))
-			
+
+			g3w = Gene3PrimeWindowGenerator(feature.location.end, self.feature_size, self.window_size, self.window_interval)
+			Gene3prime_Windows = g3w.create_windows()
+			g5w = Gene5PrimeWindowGenerator(feature.location.start, self.feature_size, self.window_size,self.window_interval)
+			Gene5prime_Windows = g5w.create_windows()
+
+			for i in range(0, len(Gene3prime_Windows)):
 			# forward direction
-			if feature.strand == 1:
-				new_features.append(self.construct_start_feature(feature, gene_name, "__5prime",locus_tag, product))
-				new_features.append(self.construct_end_feature(feature, gene_name, "__3prime",locus_tag, product))
-			else:
-				new_features.append(self.construct_end_feature(feature, gene_name, "__5prime", locus_tag, product))
-				new_features.append(self.construct_start_feature(feature, gene_name, "__3prime",locus_tag, product))
+				if feature.strand == 1:
+					new_features.append(self.construct_start_feature(feature, gene_name, str("__5prime___" + str(Gene5prime_Windows[i].start) + "_" +  str(Gene5prime_Windows[i].end)),locus_tag, product, Gene5prime_Windows[i]))
+					new_features.append(self.construct_end_feature(feature, gene_name, str("__3prime___" + str(Gene3prime_Windows[i].start) + "_" +  str(Gene3prime_Windows[i].end)),locus_tag, product, Gene3prime_Windows[i]))
+				else:
+					new_features.append(self.construct_end_feature(feature, gene_name, str( "__5prime___" + str(Gene5prime_Windows[i].start) + "_" +  str(Gene5prime_Windows[i].end)), locus_tag, product, Gene5prime_Windows[i]))
+					new_features.append(self.construct_start_feature(feature, gene_name, str( "__3prime___" + str(Gene3prime_Windows[i].start) + "_" + str(Gene3prime_Windows[i].end)),locus_tag, product, Gene3prime_Windows[i]))
 					
 		return new_features
 		
-	def construct_end_feature(self, feature, gene_name, suffix, locus_tag, product):
-		start = feature.location.end
-		end = feature.location.end + self.feature_size
+	def construct_end_feature(self, feature, gene_name, suffix, locus_tag, product, gene_end):
+		start = gene_end.start
+		end = gene_end.end
 		
 		if end > self.genome_length:
 			end = self.genome_length
@@ -51,9 +61,9 @@ class EMBLExpandGenes:
 		
 		return FeatureProperties(start, end, feature.strand, gene_name + suffix, locus_tag + suffix, product)
 		
-	def construct_start_feature(self, feature, gene_name, suffix, locus_tag, product):
-		start = feature.location.start - self.feature_size
-		end = feature.location.start
+	def construct_start_feature(self, feature, gene_name, suffix, locus_tag, product, gene_start):
+		start = gene_start.start
+		end = gene_start.end
 		
 		if start <1: 
 			start = 1

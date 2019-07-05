@@ -81,13 +81,24 @@ class Gene:
 		else:
 			return ""
 
+	def update_feature(self):
+		self.feature = """FT   CDS             {window_start}..{window_end}
+		FT                   /gene="{gene_name}"
+		FT                   /locus_tag="{gene_name}"
+		FT                   /product=product
+		""".format(gene_name=self.gene_name, window_start=str(self.start), window_end=str(self.end))
+
 	def window_string(self):
 		return "\t".join(
 			[str(self.start) + '_' + str(self.end), str(self.category()), str(self.start), str(self.end), str(self.max_logfc), str(self.expression_from_blocks()), str(self.direction_from_blocks()), str(self.upstream_gene())])
 
 	def __str__(self):
-		return "\t".join([str(self.gene_name), str(self.category()), str(self.feature.location.start), str(self.feature.location.end), str(self.max_logfc_from_category()),  str(self.expression_from_blocks()), str(self.direction_from_blocks()), str(self.upstream_gene())] )
-		
+		try:
+			teststring = "\t".join([str(self.gene_name), str(self.category()), str(self.feature.location.start), str(self.feature.location.end), str(self.max_logfc_from_category()),  str(self.expression_from_blocks()), str(self.direction_from_blocks()), str(self.upstream_gene())] )
+			return teststring
+		except:
+			raise ValueError("some problem")
+
 	def header(self):
 		return "\t".join(['Gene', 'Category', 'Start', 'End', 'MaxLogFC', 'Expression', 'Direction', 'Upstream'])
 		

@@ -43,7 +43,7 @@ setup(
        ],
     license='GPLv3',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 1.0.0',
 		'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
         'Programming Language :: Python :: 3 :: Only',

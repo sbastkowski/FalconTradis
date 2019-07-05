@@ -1,6 +1,7 @@
 '''Driver class'''
 import logging
 import os
+import re
 import shutil
 from falcontradis.TradisGeneInsertSites import TradisGeneInsertSites
 from falcontradis.PrepareInputFiles     import PrepareInputFiles
@@ -12,6 +13,7 @@ from falcontradis.PlotMasking           import PlotMasking
 from falcontradis.BlockIdentifier       import BlockIdentifier
 from falcontradis.Gene                  import Gene
 from falcontradis.GeneAnnotator         import GeneAnnotator
+
 
 class PlotEssentiality:
 	def __init__(self, plotfile_obj,gene_insert_sites_filename, tradis_essentiality_filename, type, only_essential_filename):
@@ -159,10 +161,20 @@ class BlockInsertions:
 		while i < len(windows):
 			next_window = windows[i]
 
-			if next_window.start <= start_window.end and \
-					next_window.category() == start_window.category() and \
-					next_window.expression_from_blocks() == start_window.expression_from_blocks() and \
-					next_window.direction_from_blocks() == start_window.direction_from_blocks():
+			if (next_window.categories[0] == "increased_mutants_at_end_of_gene" or \
+					next_window.categories[0] == "increased_mutants_at_start_of_gene" or \
+					next_window.categories[0] == "decreased_mutants_at_end_of_gene" or \
+					next_window.categories[0] == "decreased_mutants_at_start_of_gene" ):
+				next_window.categories[0] = "knockout"
+			if (start_window.categories[0] == "increased_mutants_at_end_of_gene" \
+					or start_window.categories[0] == "increased_mutants_at_start_of_gene" or \
+					start_window.categories[0] == "decreased_mutants_at_end_of_gene" or \
+					start_window.categories[0] == "decreased_mutants_at_start_of_gene" ):
+				start_window.categories[0] = "knockout"
+			category_equal = next_window.categories[0] == start_window.categories[0]
+			expression_equal = next_window.expression_from_blocks() == start_window.expression_from_blocks()
+			direction_equal = next_window.direction_from_blocks() == start_window.direction_from_blocks()
+			if next_window.start <= start_window.end and category_equal and expression_equal and direction_equal:
 				start_window.end = next_window.end
 				start_window.max_logfc = max(start_window.max_logfc, next_window.max_logfc)
 			else:
@@ -170,6 +182,13 @@ class BlockInsertions:
 				copy.start = start_window.start
 				copy.end = start_window.end
 				copy.max_logfc = start_window.max_logfc
+				res = re.search("^(.+)__([35])prime", copy.gene_name)
+				if (res):
+					copy.gene_name = copy.gene_name.split("___")[0]
+					copy.gene_name = copy.gene_name + "___" + str(copy.start) + "_" + str(copy.end)
+				else:
+					copy.gene_name = str(copy.start) + "_" + str(copy.end)
+				copy.categories.append(start_window.categories[0])
 				merged_windows.append(copy)
 				start_window = next_window
 
@@ -194,18 +213,37 @@ class BlockInsertions:
 
 		# Consolidate all similar adjacent windows if annotation is not used
 		if not self.use_annotation:
-			genes = self.merge_windows(genes)
+			all_genes = self.merge_windows(genes)
+		else: # merge 3'prime and 5'prime windows
+			gene_3primes = []
+			gene_5primes = []
+			all_genes = []
+			for g in genes:
+				if "__3prime" in g.gene_name:
+					gene_3primes.append(g)
+				elif "__5prime" in g.gene_name:
+					gene_5primes.append(g)
+				else:
+					all_genes.append(g)
+			merged_3primes = self.merge_windows(gene_3primes)
+			merged_5primes = self.merge_windows(gene_5primes)
 
-		if len(genes) == 0 and len(intergenic_blocks) == 0:
+			for mw in merged_3primes:
+				all_genes.append(mw)
+			for mw in merged_5primes:
+				all_genes.append(mw)
+
+
+		if len(all_genes) == 0 and len(intergenic_blocks) == 0:
 			return []
 		
-		self.write_gene_report(genes, intergenic_blocks)
-		self.write_regulated_gene_report(genes, intergenic_blocks)
+		self.write_gene_report(all_genes, intergenic_blocks)
+		self.write_regulated_gene_report(all_genes, intergenic_blocks)
 				
 		#if self.verbose:
 			#self.print_genes_intergenic(genes,intergenic_blocks)
 		
-		return genes
+		return all_genes
 		
 	def write_gene_report(self, genes, intergenic_blocks):
 		block_filename = os.path.join(self.prefix, "gene_report.csv")

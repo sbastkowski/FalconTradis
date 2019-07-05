@@ -205,8 +205,13 @@ class GeneAnnotator:
 			# 5 prime
 			res = re.search("^(.+)__([35])prime$", name)
 			if res:
-				found_gene_name = res.group(1)
+				found_gene_name =res.group(1)
 				prime_end = res.group(2)
+				#found_gene_name = str(name).split("__")[0]
+				#prime_end = (str(name).split("__")[1]).split("-")[0]
+				interval = (str(name).split("__")[1]).split("-")[1]
+
+
 				if found_gene_name not in name_to_genes:
 					filtered_names_to_genes[found_gene_name] = Gene(self.embl_reader.genes_to_features[found_gene_name], [])
 					filtered_names_to_genes[found_gene_name].blocks = gene.blocks

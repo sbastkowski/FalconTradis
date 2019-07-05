@@ -1,3 +1,5 @@
+from typing import List
+
 from falcontradis.PlotParser import PlotParser
 from falcontradis.Block import Block
 import numpy
@@ -113,12 +115,30 @@ class BlockIdentifier:
 		
 		masking_plot = self.merge_all_plots_choosing_peak_logfc(combined_plot, forward_masking_plot, reverse_masking_plot)
 		blocks = self.increased_insertions_blocks(masking_plot) + self.decreased_insertions_blocks(masking_plot)
-		
+
+		block_filename = "block_report.csv"
+		with open(block_filename, 'w') as bf:
+			for b in blocks:
+				bf.write("Start: " + str(b.start) + " end: " + str(b.end) + "\n")
+				bf.write("Length: " + str(b.block_length) + "\n")
 		'''Filter out blocks which are less than the window size'''
-		filtered_blocks = [b for b in blocks if b.block_length >= self.window_size]
+		filtered_blocks: List[Block] = [b for b in blocks if b.block_length >= self.window_size]
+
+		block_length_Array = []
+		for b in filtered_blocks:
+			block_length_Array.append(b.end - b.start)
+		average_block_length =  numpy.mean(block_length_Array)
+		print(average_block_length)
+
 
 		for b in filtered_blocks:
 			b.direction = self.direction_for_block(b, forward_masking_plot, reverse_masking_plot)
+
+		block_filename = "filtered_block_report.csv"
+		with open(block_filename, 'w') as bf:
+			for b in filtered_blocks:
+				bf.write("Start: " + str(b.start) + " end: " + str(b.end) + "\n")
+				bf.write("Length: " + str(b.block_length) + "\n")
 		
 		return filtered_blocks
 
